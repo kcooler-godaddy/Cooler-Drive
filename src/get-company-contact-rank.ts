@@ -1,4 +1,30 @@
-import {CommandTypes, Company, ContactTypes, Employee, Partner} from "./types";
+export enum CommandTypes {
+    employee = 'Employee',
+    company = 'Company',
+    contact = 'Contact',
+    partner = 'Partner',
+}
+export enum ContactTypes {
+    call = 'call',
+    coffee = 'coffee',
+    email = 'email'
+}
+export interface Partner {
+}
+export interface Employee {
+    companyId: string;
+}
+export interface CompanyPartner {
+    employeeContacts: string[];
+    contactCount: number;
+}
+export interface Company {
+    partners: Record<string, CompanyPartner>
+    topPartner?: {
+        partnerId: string;
+        contactCount: number;
+    }
+}
 
 const partners: Record<string, Partner> = {}
 const employees: Record<string, Employee> = {}
@@ -11,12 +37,15 @@ function addPartner(partnerId: string) {
         employeeContacts: {}
     };
 }
+
 function addCompany(companyId: string) {
     companies[companyId] = { partners: {} };
 }
+
 function addEmployee(employeeId: string, employeeCompanyId: string) {
     employees[employeeId] = { companyId: employeeCompanyId }
 }
+
 function addContactToCompany(companyId: string, employeeId: string, partnerId: string) {
     const company = companies[companyId];
 
@@ -36,6 +65,7 @@ function addContactToCompany(companyId: string, employeeId: string, partnerId: s
         }
     }
 }
+
 function addContact(employeeId: string, partnerId: string, contactType: ContactTypes) {
     if (!allowedContactTypes.includes(contactType)) return;
     const companyId = employees[employeeId].companyId;
