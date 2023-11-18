@@ -1,4 +1,4 @@
-import {getCompanyContactRank} from "../get-company-contact-rank";
+import {getCompanyContactRank} from "../src/get-company-contact-rank";
 
 const input = 'Partner Chris\n' +
     'Partner Molly\n' +

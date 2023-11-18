@@ -7,7 +7,6 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 const filename = process.argv[2];
-console.log('Received input file: ', filename);
 
 fs.readFile(filename, 'utf8', (err, data) => {
     if (err) throw err;

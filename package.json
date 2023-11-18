@@ -7,7 +7,8 @@
   "bin": "src/index.ts",
   "scripts": {
     "build": "npx tsc",
-    "test": "jest"
+    "test": "jest",
+    "start": "node dist/index.js"
   },
   "author": "Kevin Cooler",
   "license": "ISC",
