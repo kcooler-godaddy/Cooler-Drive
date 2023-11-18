@@ -1,4 +1,4 @@
-import {CommandTypes, Company, ContactTypes, Employee, Partner} from "./types.js";
+import {CommandTypes, Company, ContactTypes, Employee, Partner} from "./types";
 
 const partners: Record<string, Partner> = {}
 const employees: Record<string, Employee> = {}
@@ -6,53 +6,73 @@ const companies: Record<string, Company> = {}
 
 const allowedContactTypes = [ContactTypes.call, ContactTypes.coffee, ContactTypes.email]
 
-export function getCompanyContactRank(data: string): string {
-    const commands = data.split('\n');
+function addPartner(partnerId: string) {
+    partners[partnerId] = {
+        employeeContacts: {}
+    };
+}
+function addCompany(companyId: string) {
+    companies[companyId] = { partners: {} };
+}
+function addEmployee(employeeId: string, employeeCompanyId: string) {
+    employees[employeeId] = { companyId: employeeCompanyId }
+}
+function addContactToCompany(companyId: string, employeeId: string, partnerId: string) {
+    const company = companies[companyId];
+
+    if (!company.partners[partnerId]) {
+        company.partners[partnerId] = {
+            employeeContacts: [employeeId],
+            contactCount: 1
+        }
+    } else {
+        company.partners[partnerId].employeeContacts.push(employeeId);
+        company.partners[partnerId].contactCount = company.partners[partnerId].contactCount + 1;
+    }
+    if (!company.topPartner || company.partners[partnerId].contactCount > company.topPartner.contactCount) {
+        company.topPartner = {
+            partnerId: partnerId,
+            contactCount: company.partners[partnerId].contactCount
+        }
+    }
+}
+function addContact(employeeId: string, partnerId: string, contactType: ContactTypes) {
+    if (!allowedContactTypes.includes(contactType)) return;
+    const companyId = employees[employeeId].companyId;
+    addContactToCompany(companyId, employeeId, partnerId);
+}
+
+function initializeRecordsFromCommands(commandsString: string) {
+    const commands = commandsString.split('\n');
     commands.forEach((command) => {
         const parts = command.split(' ');
-        const type = parts[0]
-        switch (type) {
+        const commandType = parts[0]
+        switch (commandType) {
             case CommandTypes.partner:
                 const partnerId = parts[1]
-                partners[partnerId] = {
-                    employeeContacts: {}
-                };
+                addPartner(partnerId);
                 break;
             case CommandTypes.company:
                 const companyId = parts[1];
-                companies[companyId] = { partners: {} };
+                addCompany(companyId);
                 break;
             case CommandTypes.employee:
                 const employeeId = parts[1];
                 const employeeCompanyId = parts[2];
-                employees[employeeId] = { companyId: employeeCompanyId }
+                addEmployee(employeeId, employeeCompanyId);
                 break;
             case CommandTypes.contact:
                 const contactEmployeeId = parts[1];
                 const contactPartnerId = parts[2];
                 const contactType = parts[3];
-                if (!allowedContactTypes.includes(contactType.toLowerCase() as ContactTypes)) break;
-                const contactCompanyId = employees[contactEmployeeId].companyId;
-                const contactCompany = companies[contactCompanyId];
-
-                if (!contactCompany.partners[contactPartnerId]) {
-                    contactCompany.partners[contactPartnerId] = {
-                        employeeContacts: [contactEmployeeId],
-                        contactCount: 1
-                    }
-                } else {
-                    contactCompany.partners[contactPartnerId].employeeContacts.push(contactEmployeeId);
-                    contactCompany.partners[contactPartnerId].contactCount = contactCompany.partners[contactPartnerId].contactCount + 1;
-                }
-                if (!contactCompany.topPartner || contactCompany.partners[contactPartnerId].contactCount > contactCompany.topPartner.contactCount) {
-                    contactCompany.topPartner = {
-                        partnerId: contactPartnerId,
-                        contactCount: contactCompany.partners[contactPartnerId].contactCount
-                    }
-                }
+                addContact(contactEmployeeId, contactPartnerId, contactType.toLowerCase() as ContactTypes);
                 break;
         }
     });
+}
+
+export function getCompanyContactRank(data: string): string {
+    initializeRecordsFromCommands(data);
     const companyNames = Object.keys(companies);
     const topCompanyPartners: string[] = []
     companyNames.sort().forEach((companyName) => {
