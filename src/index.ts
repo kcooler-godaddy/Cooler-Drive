@@ -1,9 +1,9 @@
 #!/usr/bin/env npx ts-node --esm
 import fs from 'fs';
-import { DriveContacts } from "./drive-contacts.js";
+import { DriveContacts } from "./drive-contacts";
 
 if (process.argv.length < 3) {
-    console.log('Usage: node dist/index.js <path_to_input_file>');
+    console.log('Please provide an input text file of commands: \n npm run start <path_to_input_file>');
     process.exit(1);
 }
 const filename = process.argv[2];
