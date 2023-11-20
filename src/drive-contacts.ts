@@ -1,36 +1,10 @@
-export enum CommandTypes {
-    employee = 'Employee',
-    company = 'Company',
-    contact = 'Contact',
-    partner = 'Partner',
-}
-export enum ContactTypes {
-    call = 'call',
-    coffee = 'coffee',
-    email = 'email'
-}
-export interface Partner {
-}
-export interface Employee {
-    companyId: string;
-}
-export interface CompanyPartner {
-    employeeContacts: string[];
-    contactCount: number;
-}
-export interface Company {
-    partners: Record<string, CompanyPartner>
-    topPartner?: {
-        partnerId: string;
-        contactCount: number;
-    }
-}
+import { Command, ContactType, Company, Employee, Partner } from "./types";
 
 export class DriveContacts {
     private partners: Record<string, Partner> = {}
     private employees: Record<string, Employee> = {}
     private companies: Record<string, Company> = {}
-    private allowedContactTypes = [ContactTypes.call, ContactTypes.coffee, ContactTypes.email]
+    private allowedContactTypes = [ContactType.call, ContactType.coffee, ContactType.email]
 
     constructor(commandsString: string) {
         const commands = commandsString.split('\n');
@@ -38,24 +12,24 @@ export class DriveContacts {
             const parts = command.split(' ');
             const commandType = parts[0]
             switch (commandType) {
-                case CommandTypes.partner:
+                case Command.partner:
                     const partnerId = parts[1]
                     this.addPartner(partnerId);
                     break;
-                case CommandTypes.company:
+                case Command.company:
                     const companyId = parts[1];
                     this.addCompany(companyId);
                     break;
-                case CommandTypes.employee:
+                case Command.employee:
                     const employeeId = parts[1];
                     const employeeCompanyId = parts[2];
                     this.addEmployee(employeeId, employeeCompanyId);
                     break;
-                case CommandTypes.contact:
+                case Command.contact:
                     const contactEmployeeId = parts[1];
                     const contactPartnerId = parts[2];
                     const contactType = parts[3];
-                    this.addContact(contactEmployeeId, contactPartnerId, contactType.toLowerCase() as ContactTypes);
+                    this.addContact(contactEmployeeId, contactPartnerId, contactType.toLowerCase() as ContactType);
                     break;
             }
         });
@@ -71,9 +45,9 @@ export class DriveContacts {
         this.companies[companyId] = { partners: {} };
     }
 
-    private addEmployee(employeeId: string, employeeCompanyId: string) {
+    private addEmployee(employeeId: string, companyId: string) {
         if (this.employees[employeeId]) return;
-        this.employees[employeeId] = { companyId: employeeCompanyId }
+        this.employees[employeeId] = { companyId }
     }
 
     private addContactToCompany(companyId: string, employeeId: string, partnerId: string) {
@@ -97,7 +71,7 @@ export class DriveContacts {
         }
     }
 
-    private addContact(employeeId: string, partnerId: string, contactType: ContactTypes) {
+    private addContact(employeeId: string, partnerId: string, contactType: ContactType) {
         if (
             !this.allowedContactTypes.includes(contactType) ||
             !this.employees[employeeId] ||
