@@ -1,19 +1,19 @@
 import { Command, ContactType, Company, Employee, Partner } from "./types";
 
 export class DriveContacts {
-    private partners: Record<string, Partner> = {}
-    private employees: Record<string, Employee> = {}
-    private companies: Record<string, Company> = {}
-    private allowedContactTypes = [ContactType.call, ContactType.coffee, ContactType.email]
+    private partners: Record<string, Partner> = {};
+    private employees: Record<string, Employee> = {};
+    private companies: Record<string, Company> = {};
+    private allowedContactTypes = [ContactType.call, ContactType.coffee, ContactType.email];
 
     constructor(commandsString: string) {
         const commands = commandsString.split('\n');
         commands.forEach((command) => {
             const parts = command.split(' ');
-            const commandType = parts[0]
+            const commandType = parts[0];
             switch (commandType) {
                 case Command.partner:
-                    const partnerId = parts[1]
+                    const partnerId = parts[1];
                     this.addPartner(partnerId);
                     break;
                 case Command.company:
@@ -35,6 +35,20 @@ export class DriveContacts {
         });
     }
 
+    getCompanyContactRank(): string {
+        const companyNames = Object.keys(this.companies);
+        const topCompanyPartners: string[] = [];
+        companyNames.sort().forEach((companyName) => {
+            const { topPartner } = this.companies[companyName];
+            if (!topPartner) {
+                topCompanyPartners.push(`${companyName}: No current relationship`);
+            } else {
+                topCompanyPartners.push(`${companyName}: ${topPartner.partnerId} (${topPartner.contactCount})`);
+            }
+        });
+        return topCompanyPartners.join('\n');
+    }
+
     private addPartner(partnerId: string) {
         if (this.partners[partnerId]) return;
         this.partners[partnerId] = {};
@@ -47,7 +61,7 @@ export class DriveContacts {
 
     private addEmployee(employeeId: string, companyId: string) {
         if (this.employees[employeeId]) return;
-        this.employees[employeeId] = { companyId }
+        this.employees[employeeId] = { companyId };
     }
 
     private addContactToCompany(companyId: string, employeeId: string, partnerId: string) {
@@ -58,7 +72,7 @@ export class DriveContacts {
             company.partners[partnerId] = {
                 employeeContacts: [employeeId],
                 contactCount: 1
-            }
+            };
         } else {
             company.partners[partnerId].employeeContacts.push(employeeId);
             company.partners[partnerId].contactCount = company.partners[partnerId].contactCount + 1;
@@ -67,7 +81,7 @@ export class DriveContacts {
             company.topPartner = {
                 partnerId: partnerId,
                 contactCount: company.partners[partnerId].contactCount
-            }
+            };
         }
     }
 
@@ -79,20 +93,6 @@ export class DriveContacts {
         ) return;
         const companyId = this.employees[employeeId].companyId;
         this.addContactToCompany(companyId, employeeId, partnerId);
-    }
-
-   getCompanyContactRank(): string {
-        const companyNames = Object.keys(this.companies);
-        const topCompanyPartners: string[] = []
-        companyNames.sort().forEach((companyName) => {
-            const { topPartner } = this.companies[companyName];
-            if (!topPartner) {
-                topCompanyPartners.push(`${companyName}: No current relationship`)
-            } else {
-                topCompanyPartners.push(`${companyName}: ${topPartner.partnerId} (${topPartner.contactCount})`)
-            }
-        });
-        return topCompanyPartners.join('\n');
     }
 }
 

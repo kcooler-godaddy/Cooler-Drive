@@ -46,4 +46,5 @@ Current available features:
 npm run test
 ```
 
-## Problem approach and  design decisions
+## Problem approach and design decisions
+

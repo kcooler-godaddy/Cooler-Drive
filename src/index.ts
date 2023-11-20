@@ -15,7 +15,6 @@ const filename = process.argv[2];
 fs.readFile(filename, 'utf8', (err, data) => {
     if (err) {
         console.log(Prompt.fileReadError);
-        throw err;
     }
 
     const driveContacts = new DriveContacts(data);
@@ -24,21 +23,21 @@ fs.readFile(filename, 'utf8', (err, data) => {
     let action = Action.init;
 
     while(action !== Action.exit) {
-        console.log(Prompt.main)
+        console.log(Prompt.main);
         action = prompt(Prompt.userInput) as Action;
 
         if (!validActions.includes(action)) {
-            console.log(Prompt.invalidOption)
-            action = prompt(Prompt.userInput) as Action
+            console.log(Prompt.invalidOption);
+            action = prompt(Prompt.userInput) as Action;
         }
 
         switch (action) {
             case Action.exit:
                 break;
             case Action.companyPartnerRank:
-                console.log('\n-------------------------------------')
+                console.log('\n-------------------------------------');
                 console.log('\n', driveContacts.getCompanyContactRank());
-                console.log('\n-------------------------------------\n')
+                console.log('\n-------------------------------------\n');
         }
     }
 });

@@ -21,10 +21,10 @@ describe('DriveContacts', () => {
         expectedRank = 'ACME: No current relationship\n' +
             'Globex: Chris (2)\n' +
             'Hooli: Molly (1)'
-    })
+    });
 
     describe('getCompanyContactRank', () => {
-        it('Returns company contact rank', () => {
+        it('Returns company contact rank in alphabetical order', () => {
             let driveContacts = new DriveContacts(input);
             expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
         });
@@ -41,11 +41,24 @@ describe('DriveContacts', () => {
             expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
         });
 
-        it('ignores duplicate employee add', () => {
+        it('ignores employee add if name already in use', () => {
             expectedRank = 'ACME: No current relationship\n' +
+                'Betco: No current relationship\n' +
                 'Globex: Chris (3)\n' +
                 'Hooli: Molly (1)'
-            input = input + '\nEmployee Laurie Betco\nContact Laurie Chris coffee';
+            input = input + '\nCompany Betco\nEmployee Laurie Betco\nContact Laurie Chris coffee';
+            let driveContacts = new DriveContacts(input);
+            expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
+        });
+
+        it('ignores contact add if employee does not exist', () => {
+            input = input + '\nContact Kevin Chris coffee';
+            let driveContacts = new DriveContacts(input);
+            expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
+        });
+
+        it('ignores contact add if partner does not exist', () => {
+            input = input + '\nContact Laurie Kevin coffee';
             let driveContacts = new DriveContacts(input);
             expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
         });
