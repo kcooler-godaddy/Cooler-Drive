@@ -1,4 +1,4 @@
-import { Command, ContactType, Company, Employee, Partner } from "./types";
+import {Command, ContactScore, ContactType, Company, Employee, Partner, PartnerContact} from "./types";
 
 export class DriveContacts {
     private partners: Record<string, Partner> = {};
@@ -43,7 +43,7 @@ export class DriveContacts {
             if (!topPartner) {
                 topCompanyPartners.push(`${companyName}: No current relationship`);
             } else {
-                topCompanyPartners.push(`${companyName}: ${topPartner.partnerId} (${topPartner.contactCount})`);
+                topCompanyPartners.push(`${companyName}: ${topPartner.partnerId} (${topPartner.contactScore})`);
             }
         });
         return topCompanyPartners.join('\n');
@@ -64,23 +64,24 @@ export class DriveContacts {
         this.employees[employeeId] = { companyId };
     }
 
-    private addContactToCompany(companyId: string, employeeId: string, partnerId: string) {
+    private addContactToCompany(companyId: string, employeeId: string, partnerId: string, contactType: ContactType) {
         const company = this.companies[companyId];
         if (!company) return;
 
+        const employeeContact: PartnerContact = { employeeId, contactType };
         if (!company.partners[partnerId]) {
             company.partners[partnerId] = {
-                employeeContacts: [employeeId],
-                contactCount: 1
+                employeeContacts: [employeeContact],
+                contactScore: ContactScore[contactType]
             };
         } else {
-            company.partners[partnerId].employeeContacts.push(employeeId);
-            company.partners[partnerId].contactCount = company.partners[partnerId].contactCount + 1;
+            company.partners[partnerId].employeeContacts.push(employeeContact);
+            company.partners[partnerId].contactScore += ContactScore[contactType];
         }
-        if (!company.topPartner || company.partners[partnerId].contactCount > company.topPartner.contactCount) {
+        if (!company.topPartner || company.partners[partnerId].contactScore > company.topPartner.contactScore) {
             company.topPartner = {
                 partnerId: partnerId,
-                contactCount: company.partners[partnerId].contactCount
+                contactScore: company.partners[partnerId].contactScore
             };
         }
     }
@@ -92,7 +93,7 @@ export class DriveContacts {
             !this.partners[partnerId]
         ) return;
         const companyId = this.employees[employeeId].companyId;
-        this.addContactToCompany(companyId, employeeId, partnerId);
+        this.addContactToCompany(companyId, employeeId, partnerId, contactType);
     }
 }
 

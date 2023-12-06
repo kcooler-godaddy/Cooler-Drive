@@ -23,10 +23,17 @@ export enum Command {
 }
 
 export enum ContactType {
-    call = 'call',
     coffee = 'coffee',
+    call = 'call',
     email = 'email',
     pitch = 'pitch'
+}
+
+export const ContactScore = {
+    [ContactType.call]: 2,
+    [ContactType.coffee]: 3,
+    [ContactType.email]: 1,
+    [ContactType.pitch]: 5
 }
 
 export interface Partner {
@@ -36,16 +43,21 @@ export interface Employee {
     companyId: string;
 }
 
+export interface PartnerContact {
+    employeeId: string;
+    contactType: ContactType;
+}
+
 interface CompanyPartner {
-    employeeContacts: string[];
-    contactCount: number;
+    employeeContacts: PartnerContact[];
+    contactScore: number;
 }
 
 export interface Company {
     partners: Record<string, CompanyPartner>
     topPartner?: {
         partnerId: string;
-        contactCount: number;
+        contactScore: number;
     }
 }
 

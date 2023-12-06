@@ -19,7 +19,7 @@ describe('DriveContacts', () => {
             'Contact Abdi Molly email\n' +
             'Contact Laurie Chris coffee';
         expectedRank = 'ACME: No current relationship\n' +
-            'Globex: Chris (2)\n' +
+            'Globex: Chris (4)\n' +
             'Hooli: Molly (1)'
     });
 
@@ -40,7 +40,7 @@ describe('DriveContacts', () => {
             '\nContact Laurie Molly pitch';
             let driveContacts = new DriveContacts(input);
             expectedRank = 'ACME: No current relationship\n' +
-                'Globex: Chris (3)\n' +
+                'Globex: Molly (7)\n' +
                 'Hooli: Molly (1)'
             expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
         });
@@ -54,7 +54,7 @@ describe('DriveContacts', () => {
         it('ignores employee add if name already in use', () => {
             expectedRank = 'ACME: No current relationship\n' +
                 'Betco: No current relationship\n' +
-                'Globex: Chris (3)\n' +
+                'Globex: Chris (7)\n' +
                 'Hooli: Molly (1)'
             input = input + '\nCompany Betco\nEmployee Laurie Betco\nContact Laurie Chris coffee';
             let driveContacts = new DriveContacts(input);
