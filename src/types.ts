@@ -25,7 +25,8 @@ export enum Command {
 export enum ContactType {
     call = 'call',
     coffee = 'coffee',
-    email = 'email'
+    email = 'email',
+    pitch = 'pitch'
 }
 
 export interface Partner {

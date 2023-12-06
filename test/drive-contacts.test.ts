@@ -35,6 +35,16 @@ describe('DriveContacts', () => {
             expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
         });
 
+        it('allows new contact type of pitch', () => {
+            input = input + '\nContact Jamie Chris email' +
+            '\nContact Laurie Molly pitch';
+            let driveContacts = new DriveContacts(input);
+            expectedRank = 'ACME: No current relationship\n' +
+                'Globex: Chris (3)\n' +
+                'Hooli: Molly (1)'
+            expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
+        });
+
         it('ignores duplicate company add', () => {
             input = input + '\nCompany Hooli';
             let driveContacts = new DriveContacts(input);
@@ -62,5 +72,6 @@ describe('DriveContacts', () => {
             let driveContacts = new DriveContacts(input);
             expect(driveContacts.getCompanyContactRank()).toBe(expectedRank);
         });
+
     })
 })

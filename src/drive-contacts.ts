@@ -4,7 +4,7 @@ export class DriveContacts {
     private partners: Record<string, Partner> = {};
     private employees: Record<string, Employee> = {};
     private companies: Record<string, Company> = {};
-    private allowedContactTypes = [ContactType.call, ContactType.coffee, ContactType.email];
+    private allowedContactTypes = [ContactType.call, ContactType.coffee, ContactType.email, ContactType.pitch];
 
     constructor(commandsString: string) {
         const commands = commandsString.split('\n');
